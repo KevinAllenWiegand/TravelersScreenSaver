@@ -4,7 +4,7 @@ There are currently no confuguration options.
 
 The font was found here:  https://www.therpf.com/forums/threads/travelers-font.299039/.
 
-This screensaver uses MonoGame as the engine.
+You may need to install Microsoft .NET Core 3.1 x86 from here:  https://dotnet.microsoft.com/download/dotnet-core/3.1.
 
 To install this screensaver:
 
