@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,20 +12,18 @@ namespace Travelers
         internal const int AlphabetItemHeight = 83;
         internal const int AlphabetCharacterCount = 26;
 
-        internal static int ScreenWidth;
-        internal static int ScreenHeight;
-
         internal static Texture2D TravelersAlphabet;
         internal static Texture2D TravelersAlphabet2;
         internal static Random Random = new Random();
-
-        private static object _SyncRoot = new object();
 
         private const int _InvisibleChance = 3;
         private const int _MinimumCascadeTime = 10000;
         private const int _MaximumCascadeTime = 15000;
 
+        private bool _UseMultipleMonitors = false;
         private GraphicsDeviceManager _Graphics;
+        private int _ScreenWidth;
+        private int _ScreenHeight;
         private SpriteBatch _SpriteBatch;
         private IList<SpriteItem> _SpriteItems = new List<SpriteItem>();
         private Stage _Stage;
@@ -34,26 +31,53 @@ namespace Travelers
 
         public TravelersScreenSaver()
         {
-            ScreenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            ScreenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            var point = new Point(0, 0);
 
-            if (Debugger.IsAttached)
+            if (_UseMultipleMonitors)
             {
-                ScreenWidth = 1024;
-                ScreenHeight = 768;
+                foreach (var screen in System.Windows.Forms.Screen.AllScreens)
+                {
+                    _ScreenWidth += screen.WorkingArea.Width;
+
+                    if (screen.WorkingArea.Height > _ScreenHeight)
+                    {
+                        _ScreenHeight = screen.WorkingArea.Height;
+                    }
+
+                    if (screen.WorkingArea.Y < point.Y)
+                    {
+                        var isNegative = screen.WorkingArea.Y < 0;
+
+                        point.Y = (int)Math.Ceiling((double)Math.Abs(screen.WorkingArea.Y) / AlphabetItemHeight) * AlphabetItemHeight;
+
+                        if (isNegative)
+                        {
+                            point.Y = -point.Y;
+                        }
+                    }
+                }
+
+                _ScreenHeight += Math.Abs(point.Y) * 2;
             }
+            else
+            {
+                _ScreenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                _ScreenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            }
+
+            _Graphics = new GraphicsDeviceManager(this);
+            _Graphics.PreferredBackBufferWidth = _ScreenWidth;
+            _Graphics.PreferredBackBufferHeight = _ScreenHeight;
+            _Graphics.HardwareModeSwitch = false;
+            _Graphics.GraphicsProfile = GraphicsProfile.HiDef;
+
+            Window.Position = point;
+            Window.IsBorderless = true;
+
+            _Graphics.ApplyChanges();
 
             SetSprites();
             _Stage = Stage.Alphabet;
-
-            _Graphics = new GraphicsDeviceManager(this);
-            _Graphics.PreferredBackBufferWidth = ScreenWidth;
-            _Graphics.PreferredBackBufferHeight = ScreenHeight;
-
-            if (!Debugger.IsAttached)
-            {
-                _Graphics.ToggleFullScreen();
-            }
 
             Content.RootDirectory = "Content";
         }
@@ -108,25 +132,22 @@ namespace Travelers
 
                     if (!hasOffScreenTopItem)
                     {
-                        lock (_SyncRoot)
+                        var remove = new List<SpriteItem>();
+
+                        foreach (var spriteItem in _SpriteItems)
                         {
-                            var remove = new List<SpriteItem>();
-
-                            foreach (var spriteItem in _SpriteItems)
+                            if (spriteItem.IsOffscreenBottom(_ScreenHeight))
                             {
-                                if (spriteItem.IsOffscreenBottom())
-                                {
-                                    remove.Add(spriteItem);
-                                }
+                                remove.Add(spriteItem);
                             }
-
-                            foreach (var spriteItem in remove)
-                            {
-                                _SpriteItems.Remove(spriteItem);
-                            }
-
-                            AddSprites(-(int)Math.Ceiling((double)ScreenHeight / AlphabetItemHeight), 0);
                         }
+
+                        foreach (var spriteItem in remove)
+                        {
+                            _SpriteItems.Remove(spriteItem);
+                        }
+
+                        AddSprites(-(int)Math.Ceiling((double)_ScreenHeight / AlphabetItemHeight), 0);
 
                         _NextCascade = DateTime.Now.AddMilliseconds(Random.Next(_MinimumCascadeTime, _MaximumCascadeTime));
                         _Stage = Stage.Alphabet;
@@ -146,7 +167,7 @@ namespace Travelers
 
             foreach (var spriteItem in _SpriteItems)
             {
-                spriteItem.Draw(_SpriteBatch);
+                spriteItem.Draw(_SpriteBatch, _ScreenHeight);
             }
 
             _SpriteBatch.End();
@@ -156,13 +177,10 @@ namespace Travelers
 
         private void SetSprites()
         {
-            lock (_SyncRoot)
-            {
-                _SpriteItems.Clear();
+            _SpriteItems.Clear();
 
-                AddSprites(0, (int)Math.Ceiling((double)ScreenHeight / AlphabetItemHeight));
-                AddSprites(-(int)Math.Ceiling((double)ScreenHeight / AlphabetItemHeight), 0);
-            }
+            AddSprites(0, (int)Math.Ceiling((double)_ScreenHeight / AlphabetItemHeight));
+            AddSprites(-(int)Math.Ceiling((double)_ScreenHeight / AlphabetItemHeight), 0);
         }
 
         private void AddSprites(int startingRow, int endingRow)
@@ -172,7 +190,7 @@ namespace Travelers
 
             for (var y = startingRow; y < endingRow; y++)
             {
-                for (var x = 0; x < (int)Math.Ceiling((double)ScreenWidth / AlphabetItemWidth); x++)
+                for (var x = 0; x < (int)Math.Ceiling((double)_ScreenWidth / AlphabetItemWidth); x++)
                 {
                     if (!invisibleChance)
                     {

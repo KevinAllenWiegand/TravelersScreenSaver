@@ -36,9 +36,9 @@ namespace Travelers
             return (Y + _YOffset + TravelersScreenSaver.AlphabetItemHeight) < 0;
         }
 
-        public bool IsOffscreenBottom()
+        public bool IsOffscreenBottom(int screenHeight)
         {
-            return (Y + _YOffset) >= TravelersScreenSaver.ScreenHeight;
+            return (Y + _YOffset) >= screenHeight;
         }
 
         public void Update(int yOffsetChange = 0)
@@ -57,9 +57,9 @@ namespace Travelers
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, int screenHeight)
         {
-            if (Invisible || IsOffscreenTop() || IsOffscreenBottom())
+            if (Invisible || IsOffscreenTop() || IsOffscreenBottom(screenHeight))
             {
                 return;
             }
