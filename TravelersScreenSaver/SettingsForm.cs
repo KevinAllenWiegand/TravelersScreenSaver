@@ -56,7 +56,7 @@ namespace Travelers
 
         private void UseMultipleMonitorsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            _MonitorComboBox.Enabled = _UseMultipleMonitorsCheckBox.Checked;
+            _MonitorComboBox.Enabled = !_UseMultipleMonitorsCheckBox.Checked;
             AppSettings.SetBooleanSetting(AppSettings.UseMultipleMonitorsSetting, _UseMultipleMonitorsCheckBox.Checked);
         }
     }

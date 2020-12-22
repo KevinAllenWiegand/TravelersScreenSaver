@@ -56,8 +56,6 @@ namespace Travelers
                         }
                     }
                 }
-
-                _ScreenHeight += Math.Abs(point.Y);
             }
             else
             {
@@ -72,6 +70,8 @@ namespace Travelers
                         if (screen.Primary)
                         {
                             selectedScreen = screen;
+                            point.X = selectedScreen.WorkingArea.X;
+                            point.Y = selectedScreen.WorkingArea.Y;
                             break;
                         }
                     }
@@ -84,6 +84,8 @@ namespace Travelers
                             if (monitor == $"Monitor {index}")
                             {
                                 selectedScreen = screen;
+                                point.X = selectedScreen.WorkingArea.X;
+                                point.Y = selectedScreen.WorkingArea.Y;
                                 break;
                             }
                         }
@@ -92,8 +94,18 @@ namespace Travelers
 
                 _ScreenWidth = selectedScreen.Bounds.Width;
                 _ScreenHeight = selectedScreen.Bounds.Height;
+
+                var isNegative = selectedScreen.WorkingArea.Y < 0;
+
                 point.Y = (int)Math.Ceiling((double)Math.Abs(selectedScreen.WorkingArea.Y) / AlphabetItemHeight) * AlphabetItemHeight;
+
+                if (isNegative)
+                {
+                    point.Y = -point.Y;
+                }
             }
+
+            _ScreenHeight += Math.Abs(point.Y);
 
             _Graphics = new GraphicsDeviceManager(this);
             _Graphics.PreferredBackBufferWidth = _ScreenWidth;
