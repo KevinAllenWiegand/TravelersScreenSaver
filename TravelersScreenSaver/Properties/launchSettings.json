@@ -1,8 +1,7 @@
 {
   "profiles": {
     "TravelersScreenSaver": {
-      "commandName": "Project",
-      "commandLineArgs": "/s"
+      "commandName": "Project"
     }
   }
 }

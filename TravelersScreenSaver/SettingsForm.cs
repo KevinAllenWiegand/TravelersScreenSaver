@@ -45,7 +45,7 @@ namespace Travelers
             {
                 var useMultipleMonitors = AppSettings.GetBooleanSetting(AppSettings.UseMultipleMonitorsSetting);
 
-                _UseMultipleMonitorsCheckBox.Checked = useMultipleMonitors.Value;
+                _UseMultipleMonitorsCheckBox.Checked = useMultipleMonitors;
             }
         }
 

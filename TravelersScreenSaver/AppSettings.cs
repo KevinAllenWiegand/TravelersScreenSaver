@@ -9,18 +9,20 @@ namespace Travelers
 
         public static string GetStringSetting(string key)
         {
+            string value = null;
+
             try
             {
-                return ConfigurationManager.AppSettings[key] ?? null;
+                value = ConfigurationManager.AppSettings[key];
             }
             catch (ConfigurationErrorsException)
             {
             }
 
-            return null;
+            return value ?? string.Empty;
         }
 
-        public static bool? GetBooleanSetting(string key)
+        public static bool GetBooleanSetting(string key)
         {
             try
             {
@@ -35,7 +37,7 @@ namespace Travelers
             {
             }
 
-            return null;
+            return false;
         }
 
         public static void SetStringSetting(string key, string value)

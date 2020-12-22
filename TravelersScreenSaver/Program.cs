@@ -8,13 +8,35 @@ namespace Travelers
         static void Main(string[] args)
         {
             // No arguents means show the settings screen.
-            // /c means to show the settings as a modal dialog.
-            // We don't have one at the moment, so just bail.
-            if (args == null || args.Length == 0 || (args != null && args.Length > 0 && args[0].Trim().ToLower() == "/c"))
+            if (args == null || args.Length == 0)
             {
                 using (var settingsForm = new _SettingsForm())
                 {
                     settingsForm.ShowDialog();
+                }
+
+                return;
+            }
+
+            // /c means to show the settings, possibly with a parent.
+            if (args != null && args.Length > 0 && args[0].Trim().ToLower().StartsWith("/c"))
+            {
+                var parts = args[0].Split(new string[] { ":", " " }, StringSplitOptions.RemoveEmptyEntries);
+                var hwndString = parts.Length > 0 ? parts[parts.Length - 1] : String.Empty;
+                long hwnd;
+
+                long.TryParse(hwndString, out hwnd);
+
+                using (var settingsForm = new _SettingsForm())
+                {
+                    if (hwnd > 0)
+                    {
+                        settingsForm.ShowDialog(new ParentHwndWrapper((IntPtr)hwnd));
+                    }
+                    else
+                    {
+                        settingsForm.ShowDialog();
+                    }
                 }
 
                 return;

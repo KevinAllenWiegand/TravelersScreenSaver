@@ -32,7 +32,7 @@ namespace Travelers
         {
             var point = new Point(0, 0);
 
-            if (AppSettings.GetBooleanSetting(AppSettings.UseMultipleMonitorsSetting).Value
+            if (AppSettings.GetBooleanSetting(AppSettings.UseMultipleMonitorsSetting)
                 && System.Windows.Forms.Screen.AllScreens.Length > 1)
             {
                 foreach (var screen in System.Windows.Forms.Screen.AllScreens)
