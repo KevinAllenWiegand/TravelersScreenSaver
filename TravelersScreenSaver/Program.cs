@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Travelers
 {
@@ -10,12 +11,19 @@ namespace Travelers
             // No arguents means show the settings screen.
             if (args == null || args.Length == 0)
             {
-                using (var settingsForm = new _SettingsForm())
+                if (Debugger.IsAttached)
                 {
-                    settingsForm.ShowDialog();
+                    args = new[] { "/s" };
                 }
+                else
+                {
+                    using (var settingsForm = new _SettingsForm())
+                    {
+                        settingsForm.ShowDialog();
+                    }
 
-                return;
+                    return;
+                }
             }
 
             // /c means to show the settings, possibly with a parent.

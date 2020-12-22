@@ -27,6 +27,10 @@ namespace Travelers
         private IList<SpriteItem> _SpriteItems = new List<SpriteItem>();
         private Stage _Stage;
         private DateTime _NextCascade;
+        private int _MouseXExitThreshold;
+        private int _MouseYExitThreshold;
+        private int _LastMouseX;
+        private int _LastMouseY;
 
         public TravelersScreenSaver()
         {
@@ -95,6 +99,10 @@ namespace Travelers
                 _ScreenWidth = selectedScreen.Bounds.Width;
                 _ScreenHeight = selectedScreen.Bounds.Height;
 
+                // If the user moves the mouse 10% of either the screen width or height quickly enough, we should exit.
+                _MouseXExitThreshold = (_ScreenWidth / 100) * 10;
+                _MouseYExitThreshold = (_ScreenHeight / 100) * 10;
+
                 var isNegative = selectedScreen.WorkingArea.Y < 0;
 
                 point.Y = (int)Math.Ceiling((double)Math.Abs(selectedScreen.WorkingArea.Y) / AlphabetItemHeight) * AlphabetItemHeight;
@@ -121,7 +129,7 @@ namespace Travelers
             SetSprites();
             _Stage = Stage.Alphabet;
 
-            Content.RootDirectory = "Content";
+        Content.RootDirectory = "Content";
         }
 
         protected override void Initialize()
@@ -141,6 +149,16 @@ namespace Travelers
 
         protected override void Update(GameTime gameTime)
         {
+            var mouseState = Mouse.GetState(Window);
+
+            if (_LastMouseX > 0 && _LastMouseY > 0 && ((Math.Abs(mouseState.X - _LastMouseX) > _MouseXExitThreshold) || (Math.Abs(mouseState.Y - _LastMouseY) > _MouseYExitThreshold)))
+            {
+                Exit();
+            }
+
+            _LastMouseX = mouseState.X;
+            _LastMouseY = mouseState.Y;
+
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Exit();
