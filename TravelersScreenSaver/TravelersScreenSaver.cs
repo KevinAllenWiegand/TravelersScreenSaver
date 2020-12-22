@@ -16,9 +16,17 @@ namespace Travelers
         internal static Texture2D TravelersAlphabet2;
         internal static Random Random = new Random();
 
+        private static SpriteFont _TitleFont;
+        private static SpriteFont _MainFont;
+        private static Color _TextColor = new Color(255, 115, 15);
+
         private const int _InvisibleChance = 3;
         private const int _MinimumCascadeTime = 10000;
         private const int _MaximumCascadeTime = 15000;
+        private const float _TitleFadeInSpeed = 0.025f;
+        private const float _TitleFadeOutSpeed = 0.05f;
+        private const int _TitleFadeInterval = 100;
+        private const string _WelcomeText = "Welcome to the 21st";
 
         private GraphicsDeviceManager _Graphics;
         private int _ScreenWidth;
@@ -31,6 +39,21 @@ namespace Travelers
         private int _MouseYExitThreshold;
         private int _LastMouseX;
         private int _LastMouseY;
+
+        // TODO:  Most of the following stuff really should be in wrapped objects...but I'm too lazy to do that right now.
+        private DateTime _LastAlphaUpdate;
+        private float _TitleAlpha = 0;
+        private bool _TitleFadedIn = false;
+        private bool _TitleFadedOut = false;
+        private Vector2 _WelcomeTextUnscaledSize;
+        private Vector2 _TravelerTextUnscaledSize;
+        private string _TravelerText = $"Traveler {Random.Next(1000, 10000)}";
+        private float _WelcomeTextScale;
+        private float _TravelerTextScale;
+        private Vector2 _WelcomeTextScaledSize;
+        private Vector2 _TravelerTextScaledSize;
+        private Vector2 _WelcomeTextPosition;
+        private Vector2 _TravelerTextPosition;
 
         public TravelersScreenSaver()
         {
@@ -127,9 +150,9 @@ namespace Travelers
             _Graphics.ApplyChanges();
 
             SetSprites();
-            _Stage = Stage.Alphabet;
+            _Stage = Stage.Title;
 
-        Content.RootDirectory = "Content";
+            Content.RootDirectory = "Content";
         }
 
         protected override void Initialize()
@@ -143,8 +166,36 @@ namespace Travelers
 
             TravelersAlphabet = Content.Load<Texture2D>("TravelersAlphabet");
             TravelersAlphabet2 = Content.Load<Texture2D>("TravelersAlphabet2");
+            _TitleFont = Content.Load<SpriteFont>("TitleFont");
+            _MainFont = Content.Load<SpriteFont>("MainFont");
 
-            _NextCascade = DateTime.Now.AddMilliseconds(Random.Next(_MinimumCascadeTime, _MaximumCascadeTime));
+            // TODO:  Might need to adjust the scale depending on screen size.
+            _WelcomeTextScale = 2.0f;
+            _TravelerTextScale = 1.0f;
+
+            _WelcomeTextUnscaledSize = _TitleFont.MeasureString(_WelcomeText);
+            _TravelerTextUnscaledSize = _MainFont.MeasureString(_TravelerText);
+            _WelcomeTextScaledSize = _WelcomeTextUnscaledSize * _WelcomeTextScale;
+            _TravelerTextScaledSize = _TravelerTextUnscaledSize * _TravelerTextScale;
+
+            // Only display this on the primary monitor.
+            // TODO:  In the future, maybe duplicate it on the second monitor.
+            System.Windows.Forms.Screen primaryScreen = System.Windows.Forms.Screen.AllScreens[0];
+
+            foreach (var screen in System.Windows.Forms.Screen.AllScreens)
+            {
+                if (screen.Primary)
+                {
+                    primaryScreen = screen;
+                    break;
+                }
+            }
+
+            var screenWidth = primaryScreen.Bounds.Width;
+            var screenHeight = primaryScreen.Bounds.Height;
+
+            _WelcomeTextPosition = new Vector2((screenWidth - _WelcomeTextScaledSize.X) / 2, (screenHeight - _WelcomeTextScaledSize.Y) / 2);
+            _TravelerTextPosition = new Vector2(screenWidth - _TravelerTextScaledSize.X - 5, screenHeight - _TravelerTextScaledSize.Y - 5);
         }
 
         protected override void Update(GameTime gameTime)
@@ -166,6 +217,34 @@ namespace Travelers
 
             switch (_Stage)
             {
+                case Stage.Title:
+                    if (DateTime.Now.Subtract(_LastAlphaUpdate).TotalMilliseconds > _TitleFadeInterval)
+                    {
+                        _LastAlphaUpdate = DateTime.Now;
+
+                        if (!_TitleFadedIn)
+                        {
+                            _TitleAlpha += _TitleFadeInSpeed;
+
+                            if (_TitleAlpha > 1.0f)
+                            {
+                                _TitleAlpha = 1.0f;
+                                _TitleFadedIn = true;
+                            }
+                        }
+                        else if (!_TitleFadedOut)
+                        {
+                            _TitleAlpha -= _TitleFadeOutSpeed;
+
+                            if (_TitleAlpha < 0)
+                            {
+                                _TitleAlpha = 0;
+                                _TitleFadedOut = true;
+                            }
+                        }
+                    }
+
+                    break;
                 case Stage.Alphabet:
                     foreach (var spriteItem in _SpriteItems)
                     {
@@ -223,11 +302,31 @@ namespace Travelers
         {
             GraphicsDevice.Clear(Color.Black);
 
-            _SpriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);
+            _SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-            foreach (var spriteItem in _SpriteItems)
+            switch (_Stage)
             {
-                spriteItem.Draw(_SpriteBatch, _ScreenHeight);
+                case Stage.Title:
+                    if (_TitleFadedOut)
+                    {
+                        _Stage = Stage.Alphabet;
+                        _NextCascade = DateTime.Now.AddMilliseconds(Random.Next(_MinimumCascadeTime, _MaximumCascadeTime));
+                    }
+                    else
+                    {
+                        _SpriteBatch.DrawString(_TitleFont, _WelcomeText, _WelcomeTextPosition, _TextColor * _TitleAlpha, 0f, new Vector2(0, 0), _WelcomeTextScale, SpriteEffects.None, 0f);
+                        _SpriteBatch.DrawString(_MainFont, _TravelerText, _TravelerTextPosition, _TextColor * _TitleAlpha, 0f, new Vector2(0, 0), _TravelerTextScale, SpriteEffects.None, 0f);
+                    }
+
+                    break;
+                case Stage.Alphabet:
+                case Stage.Cascade:
+                    foreach (var spriteItem in _SpriteItems)
+                    {
+                        spriteItem.Draw(_SpriteBatch, _ScreenHeight);
+                    }
+
+                    break;
             }
 
             _SpriteBatch.End();

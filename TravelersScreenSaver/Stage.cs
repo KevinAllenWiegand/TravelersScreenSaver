@@ -2,6 +2,7 @@
 {
     internal enum Stage
     {
+        Title,
         Alphabet,
         Cascade
     }
