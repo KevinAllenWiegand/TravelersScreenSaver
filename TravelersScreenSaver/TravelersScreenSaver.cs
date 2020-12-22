@@ -20,7 +20,6 @@ namespace Travelers
         private const int _MinimumCascadeTime = 10000;
         private const int _MaximumCascadeTime = 15000;
 
-        private bool _UseMultipleMonitors = false;
         private GraphicsDeviceManager _Graphics;
         private int _ScreenWidth;
         private int _ScreenHeight;
@@ -33,15 +32,16 @@ namespace Travelers
         {
             var point = new Point(0, 0);
 
-            if (_UseMultipleMonitors)
+            if (AppSettings.GetBooleanSetting(AppSettings.UseMultipleMonitorsSetting).Value
+                && System.Windows.Forms.Screen.AllScreens.Length > 1)
             {
                 foreach (var screen in System.Windows.Forms.Screen.AllScreens)
                 {
-                    _ScreenWidth += screen.WorkingArea.Width;
+                    _ScreenWidth += screen.Bounds.Width;
 
-                    if (screen.WorkingArea.Height > _ScreenHeight)
+                    if (screen.Bounds.Height > _ScreenHeight)
                     {
-                        _ScreenHeight = screen.WorkingArea.Height;
+                        _ScreenHeight = screen.Bounds.Height;
                     }
 
                     if (screen.WorkingArea.Y < point.Y)
@@ -57,12 +57,42 @@ namespace Travelers
                     }
                 }
 
-                _ScreenHeight += Math.Abs(point.Y) * 2;
+                _ScreenHeight += Math.Abs(point.Y);
             }
             else
             {
-                _ScreenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-                _ScreenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+                var monitor = AppSettings.GetStringSetting(AppSettings.MonitorSetting) ?? "Primary";
+                var index = 0;
+                var selectedScreen = System.Windows.Forms.Screen.AllScreens[0];
+
+                foreach (var screen in System.Windows.Forms.Screen.AllScreens)
+                {
+                    if (monitor == "Primary")
+                    {
+                        if (screen.Primary)
+                        {
+                            selectedScreen = screen;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (!screen.Primary)
+                        {
+                            index++;
+
+                            if (monitor == $"Monitor {index}")
+                            {
+                                selectedScreen = screen;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                _ScreenWidth = selectedScreen.Bounds.Width;
+                _ScreenHeight = selectedScreen.Bounds.Height;
+                point.Y = (int)Math.Ceiling((double)Math.Abs(selectedScreen.WorkingArea.Y) / AlphabetItemHeight) * AlphabetItemHeight;
             }
 
             _Graphics = new GraphicsDeviceManager(this);

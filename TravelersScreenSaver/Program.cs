@@ -8,21 +8,20 @@ namespace Travelers
         static void Main(string[] args)
         {
             // No arguents means show the settings screen.
-            // We don't have one at the moment, so just bail.
-            if (args == null || args.Length == 0)
-            {
-                return;
-            }
-
-            // We don't have one at the moment, so just bail.
             // /c means to show the settings as a modal dialog.
-            if (args != null && args.Length > 0 && args[0].ToLower() == "/c")
+            // We don't have one at the moment, so just bail.
+            if (args == null || args.Length == 0 || (args != null && args.Length > 0 && args[0].ToLower() == "/c"))
             {
+                using (var settingsForm = new _SettingsForm())
+                {
+                    settingsForm.ShowDialog();
+                }
+
                 return;
             }
 
-            // No preview support yet.
             // /p <hwnd> means to preview the screensaver as a child window of <hwnd>.
+            // No preview support yet.
             if (args != null && args.Length > 1 && args[0].ToLower() == "/p")
             {
                 var hwndString = args[1];
