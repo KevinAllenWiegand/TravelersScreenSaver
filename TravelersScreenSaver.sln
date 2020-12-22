@@ -5,10 +5,11 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelersScreenSaver", "TravelersScreenSaver\TravelersScreenSaver.csproj", "{97A0C0FE-1AE4-4740-95E8-39B5401CA26D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssetGenerator", "AssetGenerator\AssetGenerator.csproj", "{5638A84B-0383-4092-8B4D-565099ECFE50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetGenerator", "AssetGenerator\AssetGenerator.csproj", "{5638A84B-0383-4092-8B4D-565099ECFE50}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{073DA9ED-4193-45C0-A98D-D750BDFE7341}"
 	ProjectSection(SolutionItems) = preProject
+		LICENSE.lic = LICENSE.lic
 		README.md = README.md
 	EndProjectSection
 EndProject

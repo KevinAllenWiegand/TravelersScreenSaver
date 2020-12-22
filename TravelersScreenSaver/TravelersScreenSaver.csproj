@@ -11,6 +11,14 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
     <AssemblyName>Travelers</AssemblyName>
     <RootNamespace>Travelers</RootNamespace>
+    <Authors>Kevin Wiegand</Authors>
+    <Company>NinjaPuffer Enterprises</Company>
+    <Copyright>2020 Kevin Wiegand aka NinjaPuffer Enterprises</Copyright>
+    <PackageLicenseFile>LICENSE.lic</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/KevinAllenWiegand/TravelersScreenSaver</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/KevinAllenWiegand/TravelersScreenSaver</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageIcon>Icon.ico</PackageIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>x86</PlatformTarget>
@@ -27,5 +35,15 @@
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\LICENSE.lic">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="Icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 </Project>
