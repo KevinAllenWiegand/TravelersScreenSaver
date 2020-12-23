@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace Travelers
 {
     public partial class _SettingsForm : Form
     {
+        private const string _TravelersFontLocation = "https://www.therpf.com/forums/threads/travelers-font.299039";
+        private const string _GitHubLocation = "https://github.com/KevinAllenWiegand/TravelersScreenSaver";
+
         public _SettingsForm()
         {
             InitializeComponent();
@@ -44,6 +48,22 @@ namespace Travelers
         {
             _MonitorComboBox.Enabled = !_UseMultipleMonitorsCheckBox.Checked;
             AppSettings.SetBooleanSetting(AppSettings.UseMultipleMonitorsSetting, _UseMultipleMonitorsCheckBox.Checked);
+        }
+
+        private void TravelersFontLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {_TravelersFontLocation}")
+            {
+                CreateNoWindow = true
+            });
+        }
+
+        private void GitHubPictureBox_Click(object sender, EventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {_GitHubLocation}")
+            {
+                CreateNoWindow = true
+            });
         }
     }
 }
