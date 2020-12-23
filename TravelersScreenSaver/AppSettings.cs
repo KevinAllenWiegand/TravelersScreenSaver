@@ -22,6 +22,23 @@ namespace Travelers
             return value ?? string.Empty;
         }
 
+        public static int GetIntSetting(string key)
+        {
+            try
+            {
+                var settingString = ConfigurationManager.AppSettings[key] ?? null;
+
+                int.TryParse(settingString, out int value);
+
+                return value;
+            }
+            catch (ConfigurationErrorsException)
+            {
+            }
+
+            return 0;
+        }
+
         public static bool GetBooleanSetting(string key)
         {
             try
@@ -54,6 +71,31 @@ namespace Travelers
                 else
                 {
                     settings[key].Value = value;
+                }
+
+                configFile.Save(ConfigurationSaveMode.Modified);
+
+                ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+            }
+            catch (ConfigurationErrorsException)
+            {
+            }
+        }
+
+        public static void SetIntSetting(string key, int value)
+        {
+            try
+            {
+                var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                var settings = configFile.AppSettings.Settings;
+
+                if (settings[key] == null)
+                {
+                    settings.Add(key, value.ToString());
+                }
+                else
+                {
+                    settings[key].Value = value.ToString();
                 }
 
                 configFile.Save(ConfigurationSaveMode.Modified);

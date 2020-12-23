@@ -14,28 +14,14 @@ namespace Travelers
         {
             _MonitorComboBox.Items.Add("Primary");
 
-            var index = 0;
-
-            foreach (var screen in Screen.AllScreens)
+            for (var index = 0; index < Screen.AllScreens.Length; index++)
             {
-                if (!screen.Primary)
-                {
-                    index++;
-                    _MonitorComboBox.Items.Add($"Monitor {index}");
-                }
+                _MonitorComboBox.Items.Add($"Monitor {index + 1}");
             }
 
-            var monitor = AppSettings.GetStringSetting(AppSettings.MonitorSetting);
-            var monitorIndex = _MonitorComboBox.Items.IndexOf(monitor);
+            var monitor = AppSettings.GetIntSetting(AppSettings.MonitorSetting);
 
-            if (monitor != null && monitorIndex != -1)
-            {
-                _MonitorComboBox.SelectedIndex = monitorIndex;
-            }
-            else
-            {
-                _MonitorComboBox.SelectedIndex = 0;
-            }
+            _MonitorComboBox.SelectedIndex = monitor;
 
             var hasMultipleMonitors = Screen.AllScreens.Length > 1;
 
@@ -51,7 +37,7 @@ namespace Travelers
 
         private void MonitorComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            AppSettings.SetStringSetting(AppSettings.MonitorSetting, _MonitorComboBox.SelectedItem.ToString());
+            AppSettings.SetIntSetting(AppSettings.MonitorSetting, _MonitorComboBox.SelectedIndex);
         }
 
         private void UseMultipleMonitorsCheckBox_CheckedChanged(object sender, EventArgs e)

@@ -54,13 +54,27 @@ namespace Travelers
         private Vector2 _TravelerTextScaledSize;
         private Vector2 _WelcomeTextPosition;
         private Vector2 _TravelerTextPosition;
+        private bool _UseMultipleMonitors;
+        private System.Windows.Forms.Screen _PrimaryScreen;
+        private System.Windows.Forms.Screen _SelectedScreen;
+        private int _HeightOffsetFromMultipleMonitorNegativeBounds;
 
         public TravelersScreenSaver()
         {
             var point = new Point(0, 0);
+            
+            _UseMultipleMonitors = AppSettings.GetBooleanSetting(AppSettings.UseMultipleMonitorsSetting) && System.Windows.Forms.Screen.AllScreens.Length > 1;
 
-            if (AppSettings.GetBooleanSetting(AppSettings.UseMultipleMonitorsSetting)
-                && System.Windows.Forms.Screen.AllScreens.Length > 1)
+            foreach (var screen in System.Windows.Forms.Screen.AllScreens)
+            {
+                if (screen.Primary)
+                {
+                    _PrimaryScreen = screen;
+                    break;
+                }
+            }
+
+            if (_UseMultipleMonitors)
             {
                 foreach (var screen in System.Windows.Forms.Screen.AllScreens)
                 {
@@ -86,45 +100,28 @@ namespace Travelers
             }
             else
             {
-                var monitor = AppSettings.GetStringSetting(AppSettings.MonitorSetting) ?? "Primary";
-                var index = 0;
+                var monitor = AppSettings.GetIntSetting(AppSettings.MonitorSetting);
                 var selectedScreen = System.Windows.Forms.Screen.AllScreens[0];
 
-                foreach (var screen in System.Windows.Forms.Screen.AllScreens)
+                if (monitor == 0)
                 {
-                    if (monitor == "Primary")
+                    selectedScreen = _PrimaryScreen;
+                    point.X = selectedScreen.WorkingArea.X;
+                    point.Y = selectedScreen.WorkingArea.Y;
+                }
+                else
+                {
+                    if ((monitor - 1) < System.Windows.Forms.Screen.AllScreens.Length)
                     {
-                        if (screen.Primary)
-                        {
-                            selectedScreen = screen;
-                            point.X = selectedScreen.WorkingArea.X;
-                            point.Y = selectedScreen.WorkingArea.Y;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (!screen.Primary)
-                        {
-                            index++;
-
-                            if (monitor == $"Monitor {index}")
-                            {
-                                selectedScreen = screen;
-                                point.X = selectedScreen.WorkingArea.X;
-                                point.Y = selectedScreen.WorkingArea.Y;
-                                break;
-                            }
-                        }
+                        selectedScreen = System.Windows.Forms.Screen.AllScreens[monitor - 1];
+                        point.X = selectedScreen.WorkingArea.X;
+                        point.Y = selectedScreen.WorkingArea.Y;
                     }
                 }
 
+                _SelectedScreen = selectedScreen;
                 _ScreenWidth = selectedScreen.Bounds.Width;
                 _ScreenHeight = selectedScreen.Bounds.Height;
-
-                // If the user moves the mouse 10% of either the screen width or height quickly enough, we should exit.
-                _MouseXExitThreshold = (_ScreenWidth / 100) * 10;
-                _MouseYExitThreshold = (_ScreenHeight / 100) * 10;
 
                 var isNegative = selectedScreen.WorkingArea.Y < 0;
 
@@ -137,6 +134,10 @@ namespace Travelers
             }
 
             _ScreenHeight += Math.Abs(point.Y);
+            _HeightOffsetFromMultipleMonitorNegativeBounds = Math.Abs(point.Y);
+
+            _MouseXExitThreshold = (_ScreenWidth / 100) * 10;
+            _MouseYExitThreshold = (_ScreenHeight / 100) * 10;
 
             _Graphics = new GraphicsDeviceManager(this);
             _Graphics.PreferredBackBufferWidth = _ScreenWidth;
@@ -179,7 +180,6 @@ namespace Travelers
             _TravelerTextScaledSize = _TravelerTextUnscaledSize * _TravelerTextScale;
 
             // Only display this on the primary monitor.
-            // TODO:  In the future, maybe duplicate it on the second monitor.
             System.Windows.Forms.Screen primaryScreen = System.Windows.Forms.Screen.AllScreens[0];
 
             foreach (var screen in System.Windows.Forms.Screen.AllScreens)
@@ -191,11 +191,19 @@ namespace Travelers
                 }
             }
 
-            var screenWidth = primaryScreen.Bounds.Width;
-            var screenHeight = primaryScreen.Bounds.Height;
+            var screenWidth = _UseMultipleMonitors ? _PrimaryScreen.Bounds.Width : _SelectedScreen.Bounds.Width;
+            var screenHeight = _UseMultipleMonitors ? _PrimaryScreen.Bounds.Height : _SelectedScreen.Bounds.Height;
 
             _WelcomeTextPosition = new Vector2((screenWidth - _WelcomeTextScaledSize.X) / 2, (screenHeight - _WelcomeTextScaledSize.Y) / 2);
-            _TravelerTextPosition = new Vector2(screenWidth - _TravelerTextScaledSize.X - 5, screenHeight - _TravelerTextScaledSize.Y - 5);
+            _TravelerTextPosition = new Vector2(screenWidth - _TravelerTextScaledSize.X - 5, screenHeight -_TravelerTextScaledSize.Y - 5);
+
+            // If we are using multiple monitors, we had to adjust the screen height for negative y positions on other screens (potentially).
+            // Add in that value for when we are drawing on the main monitor to get the correct centering.
+            if (_UseMultipleMonitors)
+            {
+                _WelcomeTextPosition.Y += _HeightOffsetFromMultipleMonitorNegativeBounds;
+                _TravelerTextPosition.Y += _HeightOffsetFromMultipleMonitorNegativeBounds;
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -207,13 +215,14 @@ namespace Travelers
                 Exit();
             }
 
-            _LastMouseX = mouseState.X;
-            _LastMouseY = mouseState.Y;
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            // Screensavers turn off on any keypress.
+            if (Keyboard.GetState().GetPressedKeyCount() > 0)
             {
                 Exit();
             }
+
+            _LastMouseX = mouseState.X;
+            _LastMouseY = mouseState.Y;
 
             switch (_Stage)
             {
