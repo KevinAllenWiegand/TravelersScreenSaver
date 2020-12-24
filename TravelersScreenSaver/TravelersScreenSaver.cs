@@ -19,7 +19,7 @@ namespace Travelers
 
         private static SpriteFont _TitleFont;
         private static SpriteFont _MainFont;
-        private static Color _TextColor = new Color(255, 115, 15);
+        private static Color _TextColor = new Color(250, 110, 30);
 
         private const int _InvisibleChance = 3;
         private const int _MinimumCascadeTime = 10000;

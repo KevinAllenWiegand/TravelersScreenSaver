@@ -10,7 +10,7 @@ namespace AssetGenerator
             var alphabet = "abcdefghijklmnopqrstuvwxyz";
             var font = new Font(new FontFamily("MarsVoyager Travelers"), 55);
             // Orange
-            var orangeBrush = new SolidBrush(Color.FromArgb(255, 117, 38));
+            var orangeBrush = new SolidBrush(Color.FromArgb(250, 110, 30));
             // Red
             var redBrush = new SolidBrush(Color.FromArgb(255, 16, 0));
             // Yellow
