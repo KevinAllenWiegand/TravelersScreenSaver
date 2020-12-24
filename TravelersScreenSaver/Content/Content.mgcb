@@ -27,7 +27,7 @@
 /processorParam:TextureFormat=Compressed
 /build:TitleFont.spritefont
 
-#begin TravelersAlphabet.png
+#begin TravelersAlphabetOrange.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -37,9 +37,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:TravelersAlphabet.png
+/build:TravelersAlphabetOrange.png
 
-#begin TravelersAlphabet2.png
+#begin TravelersAlphabetRed.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -49,5 +49,17 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:TravelersAlphabet2.png
+/build:TravelersAlphabetRed.png
+
+#begin TravelersAlphabetYellow.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TravelersAlphabetYellow.png
 

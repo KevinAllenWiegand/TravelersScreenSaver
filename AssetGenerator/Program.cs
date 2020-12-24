@@ -9,8 +9,12 @@ namespace AssetGenerator
         {
             var alphabet = "abcdefghijklmnopqrstuvwxyz";
             var font = new Font(new FontFamily("MarsVoyager Travelers"), 55);
-            var brush1 = new SolidBrush(Color.FromArgb(255, 117, 38));
-            var brush2 = new SolidBrush(Color.FromArgb(255, 16, 0));
+            // Orange
+            var orangeBrush = new SolidBrush(Color.FromArgb(255, 117, 38));
+            // Red
+            var redBrush = new SolidBrush(Color.FromArgb(255, 16, 0));
+            // Yellow
+            var yellowBrush = new SolidBrush(Color.FromArgb(230, 160, 10));
             var maximumSize = new SizeF(0, 0);
 
             using (var bitmap = new Bitmap(1, 1))
@@ -41,13 +45,13 @@ namespace AssetGenerator
 
                 foreach (var item in alphabet)
                 {
-                    graphics.DrawString(item.ToString(), font, brush1, index * (int)Math.Ceiling(maximumSize.Width), 0);
+                    graphics.DrawString(item.ToString(), font, orangeBrush, index * (int)Math.Ceiling(maximumSize.Width), 0);
                     index++;
                 }
 
                 graphics.Save();
 
-                bitmap.Save("TravelersAlphabet.png");
+                bitmap.Save("TravelersAlphabetOrange.png");
             }
 
             using (var bitmap = new Bitmap((int)Math.Ceiling(maximumSize.Width) * 26, (int)Math.Ceiling(maximumSize.Height)))
@@ -59,13 +63,31 @@ namespace AssetGenerator
 
                 foreach (var item in alphabet)
                 {
-                    graphics.DrawString(item.ToString(), font, brush2, index * (int)Math.Ceiling(maximumSize.Width), 0);
+                    graphics.DrawString(item.ToString(), font, redBrush, index * (int)Math.Ceiling(maximumSize.Width), 0);
                     index++;
                 }
 
                 graphics.Save();
 
-                bitmap.Save("TravelersAlphabet2.png");
+                bitmap.Save("TravelersAlphabetRed.png");
+            }
+
+            using (var bitmap = new Bitmap((int)Math.Ceiling(maximumSize.Width) * 26, (int)Math.Ceiling(maximumSize.Height)))
+            using (var graphics = Graphics.FromImage(bitmap))
+            {
+                graphics.Clear(Color.Transparent);
+
+                var index = 0;
+
+                foreach (var item in alphabet)
+                {
+                    graphics.DrawString(item.ToString(), font, yellowBrush, index * (int)Math.Ceiling(maximumSize.Width), 0);
+                    index++;
+                }
+
+                graphics.Save();
+
+                bitmap.Save("TravelersAlphabetYellow.png");
             }
         }
     }

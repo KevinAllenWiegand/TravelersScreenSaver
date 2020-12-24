@@ -9,8 +9,8 @@ namespace Travelers
         private int _Interval;
         private DateTime _LastUpdatedTime;
         private int _AlphabetPosition;
-
         private int _YOffset = 0;
+        private Texture2D _Color;
 
         public int X { get; private set; }
         public int Y { get; private set; }
@@ -24,6 +24,7 @@ namespace Travelers
 
             _Interval = TravelersScreenSaver.Random.Next(150, 251);
             _AlphabetPosition = TravelersScreenSaver.Random.Next(TravelersScreenSaver.AlphabetCharacterCount);
+            _Color = TravelersScreenSaver.Random.Next(100) > 95 ? TravelersScreenSaver.TravelersAlphabetYellow : TravelersScreenSaver.TravelersAlphabetOrange;
         }
 
         public bool IsPartiallyOffscreenTop()
@@ -66,8 +67,8 @@ namespace Travelers
 
             var source = new Rectangle(TravelersScreenSaver.AlphabetItemWidth * _AlphabetPosition, 0, TravelersScreenSaver.AlphabetItemWidth, TravelersScreenSaver.AlphabetItemHeight);
 
-            spriteBatch.Draw(TravelersScreenSaver.TravelersAlphabet2, new Vector2(X + 10, Y + 5 + _YOffset), source, Color.White * 0.25f);
-            spriteBatch.Draw(TravelersScreenSaver.TravelersAlphabet, new Vector2(X, Y + _YOffset), source, Color.White);
+            spriteBatch.Draw(TravelersScreenSaver.TravelersAlphabetRed, new Vector2(X + 10, Y + 5 + _YOffset), source, Color.White * 0.25f);
+            spriteBatch.Draw(_Color, new Vector2(X, Y + _YOffset), source, Color.White);
         }
 
         public override string ToString()

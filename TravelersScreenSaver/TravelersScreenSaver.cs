@@ -12,8 +12,9 @@ namespace Travelers
         internal const int AlphabetItemHeight = 83;
         internal const int AlphabetCharacterCount = 26;
 
-        internal static Texture2D TravelersAlphabet;
-        internal static Texture2D TravelersAlphabet2;
+        internal static Texture2D TravelersAlphabetOrange;
+        internal static Texture2D TravelersAlphabetRed;
+        internal static Texture2D TravelersAlphabetYellow;
         internal static Random Random = new Random();
 
         private static SpriteFont _TitleFont;
@@ -150,9 +151,6 @@ namespace Travelers
 
             _Graphics.ApplyChanges();
 
-            SetSprites();
-            _Stage = Stage.Title;
-
             Content.RootDirectory = "Content";
         }
 
@@ -165,8 +163,9 @@ namespace Travelers
         {
             _SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            TravelersAlphabet = Content.Load<Texture2D>("TravelersAlphabet");
-            TravelersAlphabet2 = Content.Load<Texture2D>("TravelersAlphabet2");
+            TravelersAlphabetOrange = Content.Load<Texture2D>("TravelersAlphabetOrange");
+            TravelersAlphabetRed = Content.Load<Texture2D>("TravelersAlphabetRed");
+            TravelersAlphabetYellow = Content.Load<Texture2D>("TravelersAlphabetYellow");
             _TitleFont = Content.Load<SpriteFont>("TitleFont");
             _MainFont = Content.Load<SpriteFont>("MainFont");
 
@@ -204,6 +203,9 @@ namespace Travelers
                 _WelcomeTextPosition.Y += _HeightOffsetFromMultipleMonitorNegativeBounds;
                 _TravelerTextPosition.Y += _HeightOffsetFromMultipleMonitorNegativeBounds;
             }
+
+            SetSprites();
+            _Stage = Stage.Title;
         }
 
         protected override void Update(GameTime gameTime)
